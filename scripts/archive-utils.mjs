@@ -1,9 +1,11 @@
 import { createHash } from "node:crypto";
-import { lstat, mkdir, readFile, readdir, writeFile } from "node:fs/promises";
+import { constants } from "node:fs";
+import { lstat, mkdir, open, readdir, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve, sep } from "node:path";
 import JSZip from "jszip";
 
 const archiveDate = new Date(Date.UTC(2000, 0, 1, 0, 0, 0));
+const readOnlyNoFollow = constants.O_RDONLY | (constants.O_NOFOLLOW ?? 0);
 
 function normalizeArchivePath(value) {
   const path = value.split(sep).join("/");
@@ -45,6 +47,44 @@ export async function listRelativeFiles(directory) {
   return files.sort();
 }
 
+async function readRegularFile(absolutePath, archivePath) {
+  let fileHandle;
+
+  try {
+    fileHandle = await open(absolutePath, readOnlyNoFollow);
+  } catch (error) {
+    if (error?.code === "ELOOP") {
+      throw new Error(`Archive source must be a regular file: ${archivePath}`, {
+        cause: error
+      });
+    }
+
+    throw error;
+  }
+
+  try {
+    const [openedEntry, pathEntry] = await Promise.all([
+      fileHandle.stat({ bigint: true }),
+      lstat(absolutePath, { bigint: true })
+    ]);
+    const entriesMatch =
+      openedEntry.dev === pathEntry.dev && openedEntry.ino === pathEntry.ino;
+
+    if (
+      !openedEntry.isFile() ||
+      !pathEntry.isFile() ||
+      pathEntry.isSymbolicLink() ||
+      !entriesMatch
+    ) {
+      throw new Error(`Archive source must be a regular file: ${archivePath}`);
+    }
+
+    return await fileHandle.readFile();
+  } finally {
+    await fileHandle.close();
+  }
+}
+
 export async function createArchiveBuffer(sourceDirectory, relativePaths) {
   const rootDirectory = resolve(sourceDirectory);
   const paths = [...new Set(relativePaths ?? await listRelativeFiles(rootDirectory))]
@@ -60,13 +100,7 @@ export async function createArchiveBuffer(sourceDirectory, relativePaths) {
       throw new Error(`Archive path escapes the source directory: ${path}`);
     }
 
-    const entry = await lstat(absolutePath);
-
-    if (!entry.isFile() || entry.isSymbolicLink()) {
-      throw new Error(`Archive source must be a regular file: ${path}`);
-    }
-
-    zip.file(path, await readFile(absolutePath), {
+    zip.file(path, await readRegularFile(absolutePath, path), {
       createFolders: false,
       date: archiveDate,
       unixPermissions: 0o100644
