@@ -433,7 +433,7 @@ test("the completed response wins over the pending state", async () => {
     requestId: "request-7",
     url
   });
-  emitWebRequest("onCompleted", {
+  await emitWebRequest("onCompleted", {
     tabId,
     requestId: "request-7",
     statusCode: 200,
@@ -486,7 +486,7 @@ test("webRequest remains authoritative over navigation timing", async () => {
     requestId: "request-9",
     url
   });
-  emitWebRequest("onCompleted", {
+  await emitWebRequest("onCompleted", {
     tabId,
     requestId: "request-9",
     statusCode: 304,
@@ -524,7 +524,7 @@ test("webNavigation commit and completion reapply the navigation icon", async ()
     requestId: "request-10",
     url
   });
-  emitWebRequest("onCompleted", {
+  await emitWebRequest("onCompleted", {
     tabId,
     requestId: "request-10",
     statusCode: 204,
@@ -565,7 +565,7 @@ test("webNavigation start clears the previous document status", async () => {
     timeStamp: 100,
     url: oldUrl
   });
-  emitWebRequest("onCompleted", {
+  await emitWebRequest("onCompleted", {
     tabId,
     requestId: "request-13",
     statusCode: 200,
@@ -657,7 +657,7 @@ test("a stale request cannot overwrite a newer navigation", async () => {
     requestId: "new-request",
     url: newUrl
   });
-  emitWebRequest("onCompleted", {
+  await emitWebRequest("onCompleted", {
     tabId,
     requestId: "old-request",
     statusCode: 200,
@@ -671,7 +671,7 @@ test("a stale request cannot overwrite a newer navigation", async () => {
     false
   );
 
-  emitWebRequest("onCompleted", {
+  await emitWebRequest("onCompleted", {
     tabId,
     requestId: "new-request",
     statusCode: 201,
@@ -704,7 +704,7 @@ test("a stale request stays rejected after an event-page restart", async () => {
   calls.length = 0;
   appliedCalls.length = 0;
 
-  emitWebRequest("onCompleted", {
+  await emitWebRequest("onCompleted", {
     tabId,
     requestId: "restart-old-request",
     statusCode: 200,
@@ -717,7 +717,7 @@ test("a stale request stays rejected after an event-page restart", async () => {
     false
   );
 
-  emitWebRequest("onCompleted", {
+  await emitWebRequest("onCompleted", {
     tabId,
     requestId: "restart-new-request",
     statusCode: 202,
@@ -768,7 +768,7 @@ test("a same-URL navigation rejects an old document fallback", async () => {
     documentId: "old-document",
     url
   });
-  emitWebRequest("onCompleted", {
+  await emitWebRequest("onCompleted", {
     tabId,
     requestId: "same-url-old-request",
     statusCode: 200,
@@ -838,7 +838,7 @@ test("rendering is serialized when a pending update resolves late", async () => 
 
   assert.equal(getCalls("setTitle", tabId).at(-1)[1].title, "Waiting for an HTTP status code");
 
-  emitWebRequest("onCompleted", {
+  await emitWebRequest("onCompleted", {
     tabId,
     requestId: "request-12",
     statusCode: 200,
@@ -921,7 +921,7 @@ test("web request lifecycle updates early and final response statuses", async ()
   await settle(tabId);
   assert.equal(getEffectiveTitle(tabId), "200 OK");
 
-  emitWebRequest("onCompleted", {
+  await emitWebRequest("onCompleted", {
     tabId,
     requestId: "lifecycle",
     statusCode: 204,
@@ -958,7 +958,7 @@ test("identical response stages do not rewrite or rerender the same status", asy
     statusCode: 200,
     url
   });
-  emitWebRequest("onCompleted", {
+  await emitWebRequest("onCompleted", {
     tabId,
     requestId: "deduplicated",
     statusCode: 200,
@@ -1068,7 +1068,7 @@ test("invalid tab IDs are ignored by web request handling", async () => {
   appliedCalls.length = 0;
 
   emitWebRequest("onBeforeRequest", { tabId: -1, requestId: "invalid-tab", url: "https://invalid.example/" });
-  emitWebRequest("onCompleted", {
+  await emitWebRequest("onCompleted", {
     tabId: -1,
     requestId: "invalid-tab",
     statusCode: 200,
@@ -1141,7 +1141,7 @@ test("same-document navigation preserves the current status and ignores subframe
   const url = "https://same-document.example/page";
   setTab(tabId, url);
   emitWebRequest("onBeforeRequest", { tabId, requestId: "same-document", url });
-  emitWebRequest("onCompleted", { tabId, requestId: "same-document", statusCode: 200, url });
+  await emitWebRequest("onCompleted", { tabId, requestId: "same-document", statusCode: 200, url });
   await settle(tabId);
   calls.length = 0;
   appliedCalls.length = 0;
@@ -1197,10 +1197,10 @@ test("cached navigation restores a prior URL from history", async () => {
   setTab(tabId, newUrl);
 
   emitWebRequest("onBeforeRequest", { tabId, requestId: "history-old", url: oldUrl });
-  emitWebRequest("onCompleted", { tabId, requestId: "history-old", statusCode: 304, url: oldUrl });
+  await emitWebRequest("onCompleted", { tabId, requestId: "history-old", statusCode: 304, url: oldUrl });
   await settle(tabId);
   emitWebRequest("onBeforeRequest", { tabId, requestId: "history-new", url: newUrl });
-  emitWebRequest("onCompleted", { tabId, requestId: "history-new", statusCode: 500, url: newUrl });
+  await emitWebRequest("onCompleted", { tabId, requestId: "history-new", statusCode: 500, url: newUrl });
   await settle(tabId);
   calls.length = 0;
   appliedCalls.length = 0;
@@ -1223,10 +1223,10 @@ test("forward-back navigation restores history by transition qualifier", async (
   setTab(tabId, firstUrl);
 
   emitWebRequest("onBeforeRequest", { tabId, requestId: "bf-first", url: firstUrl });
-  emitWebRequest("onCompleted", { tabId, requestId: "bf-first", statusCode: 201, url: firstUrl });
+  await emitWebRequest("onCompleted", { tabId, requestId: "bf-first", statusCode: 201, url: firstUrl });
   await settle(tabId);
   emitWebRequest("onBeforeRequest", { tabId, requestId: "bf-second", url: secondUrl });
-  emitWebRequest("onCompleted", { tabId, requestId: "bf-second", statusCode: 202, url: secondUrl });
+  await emitWebRequest("onCompleted", { tabId, requestId: "bf-second", statusCode: 202, url: secondUrl });
   await settle(tabId);
 
   emitWebNavigation("onCommitted", {
@@ -1253,7 +1253,7 @@ test("cached navigation preserves persisted history across restart and a new req
     documentId: "persisted-document-first",
     url: firstUrl
   });
-  emitWebRequest("onCompleted", {
+  await emitWebRequest("onCompleted", {
     tabId,
     requestId: "persisted-first",
     statusCode: 201,
@@ -1267,7 +1267,7 @@ test("cached navigation preserves persisted history across restart and a new req
     documentId: "persisted-document-second",
     url: secondUrl
   });
-  emitWebRequest("onCompleted", {
+  await emitWebRequest("onCompleted", {
     tabId,
     requestId: "persisted-second",
     statusCode: 404,
@@ -1284,7 +1284,7 @@ test("cached navigation preserves persisted history across restart and a new req
     documentId: "persisted-document-third",
     url: thirdUrl
   });
-  emitWebRequest("onCompleted", {
+  await emitWebRequest("onCompleted", {
     tabId,
     requestId: "persisted-third",
     statusCode: 503,
@@ -1398,7 +1398,7 @@ test("stored state is restored after a background restart", async () => {
   const url = "https://storage-restore.example/";
   setTab(tabId, url);
   emitWebRequest("onBeforeRequest", { tabId, requestId: "stored", url });
-  emitWebRequest("onCompleted", { tabId, requestId: "stored", statusCode: 418, url });
+  await emitWebRequest("onCompleted", { tabId, requestId: "stored", statusCode: 418, url });
   await settle(tabId);
   await settleStorage(tabId);
   context.__testHooks.simulateRestart();
@@ -1464,7 +1464,7 @@ test("tabs update requests a fresh content status report after completion", asyn
   const url = "https://tabs-updated.example/";
   setTab(tabId, url);
   emitWebRequest("onBeforeRequest", { tabId, requestId: "tabs-updated", url });
-  emitWebRequest("onCompleted", { tabId, requestId: "tabs-updated", statusCode: 200, url });
+  await emitWebRequest("onCompleted", { tabId, requestId: "tabs-updated", statusCode: 200, url });
   await settle(tabId);
   calls.length = 0;
   appliedCalls.length = 0;
@@ -1483,7 +1483,7 @@ test("tab activation restores the active tab state and missing tabs are safe", a
   const url = "https://tabs-activated.example/";
   setTab(tabId, url);
   emitWebRequest("onBeforeRequest", { tabId, requestId: "tabs-activated", url });
-  emitWebRequest("onCompleted", { tabId, requestId: "tabs-activated", statusCode: 302, url });
+  await emitWebRequest("onCompleted", { tabId, requestId: "tabs-activated", statusCode: 302, url });
   await settle(tabId);
   calls.length = 0;
   appliedCalls.length = 0;
@@ -1502,7 +1502,7 @@ test("removed tabs clear memory and session state", async () => {
   const url = "https://tabs-removed.example/";
   setTab(tabId, url);
   emitWebRequest("onBeforeRequest", { tabId, requestId: "tabs-removed", url });
-  emitWebRequest("onCompleted", { tabId, requestId: "tabs-removed", statusCode: 204, url });
+  await emitWebRequest("onCompleted", { tabId, requestId: "tabs-removed", statusCode: 204, url });
   await settle(tabId);
   await settleStorage(tabId);
 
