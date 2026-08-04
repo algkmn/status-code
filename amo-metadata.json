@@ -1,0 +1,30 @@
+{
+  "name": {
+    "en-US": "StatusCode"
+  },
+  "summary": {
+    "en-US": "See the current page's HTTP status code instantly in the Firefox toolbar."
+  },
+  "description": {
+    "en-US": "StatusCode displays the top-level document's HTTP response status directly in the Firefox toolbar.\n\nThe toolbar icon updates automatically after each navigation and uses a distinct color for every HTTP response class:\n\n• 1xx — Informational\n• 2xx — Success\n• 3xx — Redirection\n• 4xx — Client Error\n• 5xx — Server Error\n\nHover over the icon to see the status code's title. Click the icon to open the MDN HTTP Status reference in a new tab.\n\nStatusCode handles redirects, cached responses, service workers, back-forward cache navigation, and suspended background contexts. It observes only top-level document responses and does not send additional requests to determine the status code.\n\nThe icon automatically adapts to light and dark Firefox themes.\n\nStatusCode has no analytics or tracking and does not transmit browsing data. Raw URLs are never written to extension storage. Temporary local session records use one-way URL hashes and are removed when the tab or browser session ends. Private browsing is not supported."
+  },
+  "homepage": {
+    "en-US": "https://github.com/algkmn/status-code"
+  },
+  "support_email": {
+    "en-US": "algkmn@gmail.com"
+  },
+  "support_url": {
+    "en-US": "https://github.com/algkmn/status-code/issues"
+  },
+  "categories": [
+    "web-development"
+  ],
+  "version": {
+    "license": "MPL-2.0",
+    "release_notes": {
+      "en-US": "Initial release.\n\n• Displays the main document HTTP status code in the toolbar\n• Color-coded 1xx–5xx response classes\n• Status title tooltip\n• Light and dark theme support\n• Redirect, cache, service worker, and back-forward cache handling\n• One-click access to the MDN HTTP status reference\n• No data collection"
+    },
+    "approval_notes": "The extension uses webRequest and webNavigation only to identify the HTTP status of top-level HTTP and HTTPS navigations. Host access is limited to http://*/* and https://*/*. Request bodies, response bodies, headers, cookies, page content, and browsing data are not collected or transmitted. Raw URLs are processed in volatile memory but never written to extension storage. browser.storage.session contains only display metadata, Firefox request/document identifiers, and one-way SHA-256 URL hashes so the icon can be restored after background suspension. Per-tab records are removed when a tab closes and session storage is cleared by Firefox at session end. The manifest declares incognito: not_allowed. There is no remote code, analytics, tracking, account, payment, or background network request. Clicking the toolbar icon opens the public MDN HTTP status reference as an explicit user action. Runtime JavaScript is included unminified. The submitted source archive builds deterministic runtime and source ZIP files from explicit allowlists using the documented Node.js and npm versions."
+  }
+}

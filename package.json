@@ -1,0 +1,60 @@
+{
+  "name": "status-code",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Firefox toolbar extension that displays the current site's HTTP status code.",
+  "keywords": [
+    "firefox",
+    "firefox-addon",
+    "http",
+    "status-code",
+    "webextension"
+  ],
+  "homepage": "https://github.com/algkmn/status-code#readme",
+  "bugs": {
+    "url": "https://github.com/algkmn/status-code/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/algkmn/status-code.git"
+  },
+  "license": "MPL-2.0",
+  "author": {
+    "name": "Ali Gökmen",
+    "email": "algkmn@gmail.com",
+    "url": "https://github.com/algkmn"
+  },
+  "type": "module",
+  "engines": {
+    "node": "24.14.x",
+    "npm": "11.9.x"
+  },
+  "packageManager": "npm@11.9.0",
+  "scripts": {
+    "generate:icons": "node scripts/generate-icons.mjs",
+    "prepare:extension": "node scripts/prepare-extension.mjs",
+    "pretest": "npm run generate:icons",
+    "test": "node --test",
+    "pretest:coverage": "npm run generate:icons",
+    "test:coverage": "node --test --experimental-test-coverage --test-coverage-include=background.js --test-coverage-include=content.js --test-coverage-lines=90 --test-coverage-branches=80 --test-coverage-functions=80",
+    "lint:js": "eslint .",
+    "prelint:addon": "npm run prepare:extension",
+    "lint:addon": "node scripts/lint-addon.mjs",
+    "lint": "npm run lint:js && npm run lint:addon",
+    "build": "node scripts/create-package.mjs",
+    "build:source": "node scripts/create-source-package.mjs",
+    "verify:package": "node scripts/verify-package.mjs",
+    "verify": "npm run test:coverage && npm run lint && npm run build && npm run build:source && npm run verify:package",
+    "prestart": "npm run generate:icons",
+    "start": "web-ext run --source-dir ."
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "eslint": "10.8.0",
+    "eslint-plugin-no-unsanitized": "4.1.5",
+    "fontkit": "2.0.4",
+    "globals": "17.9.0",
+    "jszip": "3.10.1",
+    "web-ext": "10.6.0"
+  }
+}

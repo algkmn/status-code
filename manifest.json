@@ -1,0 +1,62 @@
+{
+  "manifest_version": 3,
+  "name": "StatusCode",
+  "version": "1.0.0",
+  "description": "See the current page's HTTP status code instantly in the Firefox toolbar.",
+  "author": "Ali Gökmen",
+  "homepage_url": "https://github.com/algkmn/status-code",
+  "incognito": "not_allowed",
+  "icons": {
+    "32": "icons/extension.svg",
+    "48": "icons/extension.svg",
+    "64": "icons/extension.svg",
+    "96": "icons/extension.svg"
+  },
+  "action": {
+    "default_area": "navbar",
+    "default_icon": {
+      "16": "icons/status/pending.svg",
+      "32": "icons/status/pending.svg",
+      "64": "icons/status/pending.svg"
+    },
+    "default_title": "Waiting for an HTTP status code"
+  },
+  "background": {
+    "scripts": [
+      "background.js"
+    ]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": false
+    }
+  ],
+  "permissions": [
+    "storage",
+    "webNavigation",
+    "webRequest"
+  ],
+  "host_permissions": [
+    "http://*/*",
+    "https://*/*"
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "http-status-code@algkmn.dev",
+      "strict_min_version": "142.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
+    }
+  }
+}

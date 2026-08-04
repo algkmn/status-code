@@ -1,0 +1,66 @@
+name: Bug report
+description: Report reproducible incorrect behavior in StatusCode.
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: markdown
+    attributes:
+      value: Do not use this form for security vulnerabilities. Use the private security advisory link instead.
+  - type: input
+    id: version
+    attributes:
+      label: StatusCode version
+      placeholder: 1.0.0
+    validations:
+      required: true
+  - type: input
+    id: firefox
+    attributes:
+      label: Firefox version
+      placeholder: 142.0
+    validations:
+      required: true
+  - type: input
+    id: operating-system
+    attributes:
+      label: Operating system
+      placeholder: macOS 15, Windows 11, Ubuntu 24.04
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Provide the smallest repeatable sequence and a public test URL when safe.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Extension console output
+      description: Remove tokens, private URLs, and other sensitive data before posting.
+      render: shell
+  - type: checkboxes
+    id: checks
+    attributes:
+      label: Checks
+      options:
+        - label: I reproduced this with the latest StatusCode release.
+          required: true
+        - label: I searched existing issues for the same problem.
+          required: true
+        - label: This report does not contain sensitive or security-impacting details.
+          required: true
