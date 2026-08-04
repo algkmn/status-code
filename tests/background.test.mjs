@@ -304,12 +304,16 @@ async function settle(tabId) {
   throw new Error(`Render queue did not settle for tab ${tabId}`);
 }
 
-async function settleStorage(tabId) {
+async function settleStorage(tabId, { allowFailure = false } = {}) {
   for (let attempt = 0; attempt < 10; attempt += 1) {
     const task = context.__testHooks.getStorageTask(tabId);
 
     if (task) {
-      await task;
+      if (allowFailure) {
+        await task.catch(() => undefined);
+      } else {
+        await task;
+      }
     }
 
     await flush();
@@ -1382,7 +1386,7 @@ test("storage write failures do not prevent toolbar updates", async () => {
     { frameId: 0, tab: { id: tabId }, url }
   );
   await settle(tabId);
-  await settleStorage(tabId);
+  await settleStorage(tabId, { allowFailure: true });
   context.__testHooks.clearFailures();
 
   assert.equal(getEffectiveTitle(tabId), "201 Created");
